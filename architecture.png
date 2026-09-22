@@ -1,0 +1,28 @@
+             User
+               │
+               │ Upload Image
+               ▼
+     ┌─────────────────────┐
+     │      Amazon S3      │
+     │    Input Bucket     │
+     └──────────┬──────────┘
+                │
+                │ S3 ObjectCreated
+                ▼
+     ┌─────────────────────┐
+     │     AWS Lambda      │
+     │     ImageResizer    │
+     │       Python        │
+     └──────────┬──────────┘
+                │
+                │ Resize using Pillow
+                ▼
+     ┌─────────────────────┐
+     │      Amazon S3      │
+     │   Output Bucket     │
+     │  Resized Images     │
+     └─────────────────────┘
+                │
+                ▼
+         Amazon CloudWatch
+             Logs
