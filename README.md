@@ -38,31 +38,26 @@ This repository implements a **100% serverless, event-driven image processing mi
 ---
 
 ## 🏛️ System Architecture
-[ Client / Web Application ]
-│
-│  1. Upload Original Image
-▼
-┌──────────────────────────────────────────────┐
-│       Amazon S3 Source Bucket                │
-│       (e.g., my-images-input)                │
-└──────────────────────┬───────────────────────┘
-│
-│  2. S3 ObjectCreated Event (PUT)
-▼
-┌──────────────────────────────────────────────┐       ┌────────────────────────┐
-│        AWS Lambda (Python 3.12)              │──────▶│  Amazon CloudWatch     │
-│        • Downloads payload to RAM            │       │  Logs & Performance    │
-│        • Pillow (Klayers Layer) resize       │       └────────────────────────┘
-│        • Preserves MIME type & aspect ratio  │
-└──────────────────────┬───────────────────────┘
-│
-│  3. PutObject (resized_<filename>)
-▼
-┌──────────────────────────────────────────────┐
-│       Amazon S3 Target Bucket                │
-│       (e.g., my-images-resized)              │
-└──────────────────────────────────────────────┘
+## 🏛️ System Architecture
 
+```mermaid
+flowchart TD
+    A[Client / Web Application] -->|1. Upload Image| B[(Amazon S3: Input Bucket)]
+    B -->|2. S3 ObjectCreated Event| C[AWS Lambda: ImageResizer]
+    C -->|3. PutObject resized_| D[(Amazon S3: Output Bucket)]
+    C -.->|Telemetry & Execution Logs| E[Amazon CloudWatch]
+
+    subgraph Lambda Execution
+        C --- F[In-Memory Processing: io.BytesIO]
+        C --- G[Pillow: Aspect Ratio Resizing]
+    end
+
+    style A fill:#24292e,stroke:#fff,stroke-width:1px,color:#fff
+    style B fill:#569A31,stroke:#333,stroke-width:1px,color:#fff
+    style C fill:#FF9900,stroke:#333,stroke-width:1px,color:#000
+    style D fill:#569A31,stroke:#333,stroke-width:1px,color:#fff
+    style E fill:#232F3E,stroke:#333,stroke-width:1px,color:#fff
+```
 
 ---
 
